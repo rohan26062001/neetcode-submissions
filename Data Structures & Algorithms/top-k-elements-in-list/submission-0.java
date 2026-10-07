@@ -1,45 +1,41 @@
 class Solution {
     public int[] topKFrequent(int[] nums, int k) {
+        Map<Integer, Integer> map = new HashMap<>();
         int n = nums.length;
-
-        Map<Integer, Integer> frequencyMap = new HashMap<>();
-
-        for (int num : nums) {
-            frequencyMap.put(num,
-                frequencyMap.getOrDefault(num, 0) + 1);
+        for(int i = 0; i < n; i++){
+            map.put(nums[i], map.getOrDefault(nums[i], 0) + 1);
         }
 
-        List<List<Integer>> bucketList = new ArrayList<>();
+        List<List<Integer>> list = new ArrayList<>();
 
         for (int i = 0; i <= n; i++) {
-            bucketList.add(null);
+            list.add(new ArrayList<>());
         }
+        
+        map.forEach((key, value) -> {
+            list.get(value).add(key);
+        });
 
-        for (int elem : frequencyMap.keySet()) {
-            int freq = frequencyMap.get(elem);
+        return topK(list, k);
+    }
 
-            if (bucketList.get(freq) == null) {
-                bucketList.set(freq, new ArrayList<>());
-            }
+    private int[] topK(List<List<Integer>> list, int k) {
+        List<Integer> ans = new ArrayList<>();
 
-            bucketList.get(freq).add(elem);
-        }
-
-        int[] result = new int[k];
-        int idx = 0;
-
-        for (int freq = n; freq >= 0 && idx < k; freq--) {
-            if (bucketList.get(freq) != null) {
-                for (int num : bucketList.get(freq)) {
-                    result[idx++] = num;
-
-                    if (idx == k) {
-                        return result;
+        for(int i = list.size() - 1; i >= 0; i--) {
+            List<Integer> idx = list.get(i);
+            if(idx.size() == 0) {
+                continue;
+            } else {
+                for(int num : idx) {
+                    ans.add(num);
+                    if(ans.size() == k) {
+                        return ans.stream().mapToInt(x -> x).toArray();
                     }
                 }
             }
         }
 
-        return result;
+        return new int[k];
     }
 }
